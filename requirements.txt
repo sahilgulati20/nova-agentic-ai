@@ -90,7 +90,6 @@ kiwisolver==1.4.8
 lark-parser==0.8.1
 MarkupSafe==3.0.1
 matplotlib==3.10.3
-mediapipe==0.10.9
 ml_dtypes==0.5.1
 mnemonic==0.21
 more-itertools==10.6.0
