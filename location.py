@@ -5,15 +5,25 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+def get_valid_location(prompt, nova_speak, nova_listen, retries=3):
+    """Repeat prompt until user gives valid input or retries run out"""
+    for attempt in range(retries):
+        nova_speak(prompt)
+        location = nova_listen()
+        if location and location.strip():
+            return location
+        else:
+            nova_speak("I didn't catch that. Please say it again.")
+    nova_speak("I'm sorry, I couldn't understand the location.")
+    return None
+
 def enter_location_details(driver, nova_speak, nova_listen):
     wait = WebDriverWait(driver, 20)
 
     try:
-        # 🚕 Step 1: Ask for Pickup Location
-        nova_speak("Where should I pick you up from?")
-        pickup_location = nova_listen()
+        # 🚕 Step 1: Ask for Pickup Location with retries
+        pickup_location = get_valid_location("Where should I pick you up from?", nova_speak, nova_listen)
         if not pickup_location:
-            nova_speak("I didn't hear the pickup location.")
             return
 
         # Step 2: Click Pickup button
@@ -40,11 +50,9 @@ def enter_location_details(driver, nova_speak, nova_listen):
         driver.execute_script("arguments[0].click();", first_option)
         print("✅ First pickup suggestion selected")
 
-        # 🛬 Step 5: Ask for Destination
-        nova_speak("Where are you going?")
-        destination = nova_listen()
+        # 🛬 Step 5: Ask for Destination with retries
+        destination = get_valid_location("Where are you going?", nova_speak, nova_listen)
         if not destination:
-            nova_speak("I didn't hear the destination.")
             return
 
         # Step 6: Enter destination
